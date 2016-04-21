@@ -52,41 +52,5 @@ namespace MindBoxProblems
 
             Assert.That(trip.Select(l => l.Begin), Is.EqualTo(new[] { "A", "C", "B" }));
         }
-
-        [Test]
-        public void qq()
-        {
-            var sales = new[]
-            {
-                new {salesid = 10, productid = 2, datetime = DateTime.Now, customerid = 400},
-                new {salesid = 20, productid = 3, datetime = DateTime.Now.AddMinutes(1), customerid = 400},
-                new {salesid = 21, productid = 6, datetime = DateTime.Now.AddMinutes(1), customerid = 400},
-                new {salesid = 30, productid = 2, datetime = DateTime.Now.AddMinutes(2), customerid = 500},
-                new {salesid = 40, productid = 3, datetime = DateTime.Now.AddMinutes(3), customerid = 600},
-            };
-
-            var customersFirstPurchaseTimes = sales.GroupBy(s => s.customerid).Select(g => new { customerid = g.Key, datetime = g.Min(s => s.datetime)});
-            var res = sales
-                .Join(customersFirstPurchaseTimes, s => new { s.datetime, s.customerid }, sfpt => new { sfpt.datetime, sfpt.customerid }, (s, spft) => s.productid)
-                .GroupBy(p => p)
-                .Select(p => new { productid = p.Key, count = p.Count() });
-            var resFull = sales
-                .GroupBy(s => s.productid)
-                .GroupJoin(res, pg => pg.Key, r => r.productid, (grouping, enumerable) => new { productid = grouping.Key, count = enumerable.Select(e => e.count).SingleOrDefault() });
-            
-
-            
-            var qq = resFull.ToList();
-
-//SELECT productid, COUNT(firstPurchaseTime)
-//  FROM Sales
-//  LEFT JOIN 
-//    (SELECT customerid, MIN(datetime) firstPurchaseTime
-//        FROM Sales
-//        GROUP BY customerid) FirstPurchaseTimes
-//  ON FirstPurchaseTimes.customerid = Sales.customerid AND FirstPurchaseTimes.firstPurchaseTime = Sales.datetime
-//  GROUP BY productid
-//GO
-        }
     }
 }
